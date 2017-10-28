@@ -38,9 +38,11 @@ namespace Web.Repositories
             return Task.CompletedTask;
         }
 
-        public IQueryable<CounterState> Query()
+        public Task<CounterState> GetLast()
         {
-            return _counterStates.Values.AsQueryable();
+            return Task.FromResult(_counterStates.Values
+                .OrderByDescending(s => s.CreatedAt)
+                .FirstOrDefault());
         }
     }
 }

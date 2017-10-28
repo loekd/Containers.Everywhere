@@ -8,11 +8,13 @@ import { AppThunkAction } from './';
 export interface CounterState {
     count: number;
     createdAt: Date;
+    store: string;
 }
 
 export interface CounterData {
     count: number;
     createdAt: Date;
+    store: string;
 }
 // -----------------
 // ACTIONS - These are serializable (hence replayable) descriptions of state transitions.
@@ -67,12 +69,12 @@ export const actionCreators = {
 export const reducer: Reducer<CounterState> = (state: CounterState, action: KnownAction) => {
     switch (action.type) {
         case 'INCREMENT_COUNT':
-            return { count: state.count + 1, createdAt: new Date() };
+            return { count: state.count + 1, createdAt: new Date(), store: ''};
         case 'DECREMENT_COUNT':
-            return { count: state.count - 1, createdAt: new Date() };
+            return { count: state.count - 1, createdAt: new Date(), store: ''};
         case 'GET_DATA':
         case 'POST_DATA':
-            return { count: action.data.count, createdAt: action.data.createdAt };
+            return { count: action.data.count, createdAt: action.data.createdAt, store: action.data.store };
         default:
             // The following line guarantees that every action in the KnownAction union has been covered by a case above
             const exhaustiveCheck: never = action;

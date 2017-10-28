@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Web.Repositories
 {
@@ -13,6 +12,6 @@ namespace Web.Repositories
 
         Task Delete(CounterState state);
 
-        IQueryable<CounterState> Query();
+        Task<CounterState> GetLast();
     }
 }

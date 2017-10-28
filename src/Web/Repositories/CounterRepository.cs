@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web.Repositories
 {
@@ -36,9 +37,11 @@ namespace Web.Repositories
             return _dbContext.SaveChangesAsync();
         }
 
-        public IQueryable<CounterState> Query()
+        public Task<CounterState> GetLast()
         {
-            return _dbContext.CounterStates.AsQueryable();
+            return _dbContext.CounterStates
+                .OrderByDescending(s => s.CreatedAt)
+                .FirstOrDefaultAsync();
         }
     }
 }

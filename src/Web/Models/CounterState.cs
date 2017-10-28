@@ -7,5 +7,7 @@ namespace Web.Models
         public int? Count { get; set; } 
         
         public DateTimeOffset CreatedAt { get; set; }
+
+        public string Store { get; set; }
     }
 }

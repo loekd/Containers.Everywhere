@@ -18,13 +18,15 @@ class Counter extends React.Component<CounterProps, {}> {
 
                    <h2>Current count: <strong>{this.props.count}</strong></h2>
                    <h2>Created at: <strong>{this.props.createdAt}</strong></h2>
+                   <h2>Stored in: <strong>{this.props.store}</strong></h2>
 
                    <button className="btn" onClick={() => { this.props.get(); }}>Get Counter</button>
                    <button className="btn" onClick={() => {
                 this.props.post(
                     {
                         count: this.props.count + 1,
-                        createdAt: this.props.createdAt
+                        createdAt: this.props.createdAt,
+                        store: "hallo?",
                     });
             }}>Update Counter</button>
                </div>;

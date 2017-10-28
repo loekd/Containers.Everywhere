@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Web.Repositories;
 using CounterState = Web.Models.CounterState;
 
@@ -12,10 +10,12 @@ namespace Web.Controllers
     public class SampleDataController : Controller
     {
         private readonly ICounterRepository _counterRepository;
+        private readonly string _storeType;
 
         public SampleDataController(ICounterRepository counterRepository)
         {
             _counterRepository = counterRepository ?? throw new ArgumentNullException(nameof(counterRepository));
+            _storeType = counterRepository.GetType().Name;
         }
 
         [HttpGet]
@@ -24,14 +24,17 @@ namespace Web.Controllers
             await _counterRepository.Initialize();
 
             var state = await _counterRepository
-                .Query()
-                .OrderByDescending(s => s.CreatedAt)
-                .FirstOrDefaultAsync();
+                .GetLast();
 
             if (state == null)
                 return NotFound();
 
-            return Ok(state);
+            return Ok(new CounterState
+            {
+                Count = state.Count,
+                CreatedAt = state.CreatedAt,
+                Store = _storeType
+            });
         }
 
         [HttpPost]
@@ -41,9 +44,7 @@ namespace Web.Controllers
 
             bool exists = false;
             var existingState = await _counterRepository
-                .Query()
-                .OrderByDescending(s => s.CreatedAt)
-                .FirstOrDefaultAsync();
+                .GetLast();
 
             if (existingState == null)
             {
@@ -73,8 +74,13 @@ namespace Web.Controllers
             {
                 await _counterRepository.Add(existingState);
             }
-
-            return Ok(existingState);
+ 
+            return Ok(new CounterState
+            {
+                Count = existingState.Count,
+                CreatedAt = existingState.CreatedAt,
+                Store = _storeType
+            });
         }
     }
 }
