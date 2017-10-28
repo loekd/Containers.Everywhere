@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  web:
+    depends_on:
+      - db
+    image: web
+    build:
+      context: ./src/Web
+      dockerfile: Dockerfile
+
+  db:
+    ports:
+      - "1433"
+    image: microsoft/mssql-server-linux
+    volumes:
+      - mssql_server_data:/var/oconnectionpt/mssql/data
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=yourStrong(!)Password
+volumes:
+  mssql_server_data:
