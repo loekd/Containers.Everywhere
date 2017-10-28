@@ -24,8 +24,16 @@ namespace Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddDbContext<CounterStateDbContext>();
-            services.AddScoped<ICounterRepository, CounterRepository>();
+            var noDatabase = Configuration.GetValue<bool>("NO_DB");
+            if (noDatabase)
+            {
+                services.AddSingleton<ICounterRepository, MemoryCounterRepository>();
+            }
+            else
+            {
+                services.AddDbContext<CounterStateDbContext>();
+                services.AddScoped<ICounterRepository, CounterRepository>();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
