@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  web:
+    depends_on:
+      - db
+    image: containerseverywhere.azurecr.io/web
+    ports:
+      - "80"
+
+  db:
+    ports:
+      - "1433"
+    image: microsoft/mssql-server-linux
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=yourStrong(!)Password
