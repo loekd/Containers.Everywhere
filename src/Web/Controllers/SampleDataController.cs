@@ -98,5 +98,32 @@ namespace Web.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> QueryDb()
+        {
+            try
+            {
+                await _counterRepository.Initialize();
+
+                var state = await _counterRepository
+                    .GetLast();
+
+                if (state == null)
+                    return NotFound();
+
+                return Ok(new CounterState
+                {
+                    Count = state.Count,
+                    CreatedAt = state.CreatedAt,
+                    Store = _storeType
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
