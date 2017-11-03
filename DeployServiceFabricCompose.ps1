@@ -7,7 +7,10 @@
      $ComposeFilePath = "./docker-compose-asf.yml",
      [Parameter(Mandatory=$False)]
      [string]
-     $DockerRegistryEndpointName ="ContainerRegistry",
+     $ContainerRegistryUsername,     
+     [Parameter(Mandatory=$False)]
+     [string]
+     $ContainerRegistryPassword,
      [Parameter(Mandatory=$False)]
      [string]
      $CertThumbPrint = "D77444F0BD5B9CAAC0C0C9960478C2F771E461C2",
@@ -15,6 +18,7 @@
      [string]
      $ClusterEndpoint = "containerseverywhere.westeurope.cloudapp.azure.com:19000"
  )
+
 
  #for local testing
  function Connect(){
@@ -38,28 +42,26 @@
  }
 
  #Rollout new compose deployment
- function Deploy(){
-    
-    $DockerRegistryEndpointName = Get-VstsInput -Name $DockerRegistryEndpointName -Require
-    $dockerRegistryEndpoint = Get-VstsEndpoint -Name $DockerRegistryEndpointName -Require
-    $authParams = $dockerRegistryEndpoint.Auth.Parameters
-    $username = $authParams.username
-    $password = $authParams.password
-    New-ServiceFabricComposeDeployment -DeploymentName $DeploymentName -Compose $ComposeFilePath -RegistryUserName $username -RegistryPassword $password
+ function Deploy(){   
+    New-ServiceFabricComposeDeployment -DeploymentName $DeploymentName -Compose $ComposeFilePath -RegistryUserName $ContainerRegistryUsername -RegistryPassword $ContainerRegistryPassword
 }
 
-#$connected = Get-ServiceFabricApplication -ErrorAction Continue
-#if(!$connected)
-#{
-#    Connect
-#}
-#
-#$connected = Get-ServiceFabricApplication -ErrorAction Continue
-#if(!$connected)
-#{
-#    Write-Error "Failed to connect to cluster"
-#    exit
-#}
+#Connect to cluster from test machine
+function Connect(){
+    $connected = Get-ServiceFabricApplication -ErrorAction Continue
+    if(!$connected)
+    {
+        Connect
+    }
+    
+    $connected = Get-ServiceFabricApplication -ErrorAction Continue
+    if(!$connected)
+    {
+        Write-Error "Failed to connect to cluster"
+        exit
+    }
+}
 
+#Connect
 Remove
 Deploy
