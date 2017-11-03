@@ -30,7 +30,10 @@ spec:
     spec:
       containers:
       - name: website
-        image: containerseverywhere.azurecr.io/web:__Build.BuildId__        
+        image: containerseverywhere.azurecr.io/web:__Build.BuildId__
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: k8s
         ports:
         - containerPort: 80
       imagePullSecrets:
@@ -56,10 +59,10 @@ spec:
         image: microsoft/mssql-server-linux:latest
         env:
         - name: ACCEPT_EULA
-          value: y
+          value: "y"
         - name: SA_PASSWORD
           value: yourStrong(!)Password
         ports:
-        - containerPort: 1433      
+        - containerPort: 1433
       nodeSelector:
           beta.kubernetes.io/os: linux
