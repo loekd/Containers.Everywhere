@@ -6,7 +6,7 @@ services:
       - db
     image: containerseverywhere.azurecr.io/web:__Build.BuildId__
     ports:
-      - "80"
+      - "80:80"
 
   db:
     ports:
