@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Web.Repositories;
 using CounterState = Web.Models.CounterState;
 
@@ -12,13 +11,11 @@ namespace Web.Controllers
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
-        private readonly IConfiguration _configuration;
         private readonly ICounterRepository _counterRepository;
         private readonly string _storeType;
 
-        public SampleDataController(ICounterRepository counterRepository, IConfiguration configuration)
+        public SampleDataController(ICounterRepository counterRepository)
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _counterRepository = counterRepository ?? throw new ArgumentNullException(nameof(counterRepository));
             _storeType = counterRepository.GetType().Name;
         }
@@ -91,16 +88,14 @@ namespace Web.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> PingDb()
         {
-            string database = _configuration.GetValue<string>("Database") ?? "db";
-
             try
             {
-                var addresses = await Dns.GetHostAddressesAsync(database).ConfigureAwait(false);
+                var addresses = await Dns.GetHostAddressesAsync("db").ConfigureAwait(false);
                 return Ok(addresses.Select(a => a.ToString()).ToList());
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error connecting to database '{database}', exception:{ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -127,9 +122,7 @@ namespace Web.Controllers
             }
             catch (Exception ex)
             {
-                string database = _configuration.GetValue<string>("Database");
-
-                return BadRequest($"Error connecting to database '{database}', exception:{ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
     }

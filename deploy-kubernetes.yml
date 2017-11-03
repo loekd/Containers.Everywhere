@@ -15,6 +15,22 @@ spec:
     protocol: TCP
     name: http
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    version: dev
+    product: ContainersEverywhere
+spec:
+  selector:
+    app: db
+  type: NodePort
+  ports:
+  - port: 1433
+    targetPort: 1433
+    protocol: TCP
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -31,9 +47,6 @@ spec:
       containers:
       - name: website
         image: containerseverywhere.azurecr.io/web:__Build.BuildId__
-        env:
-        - name: ASPNETCORE_ENVIRONMENT
-          value: k8s
         ports:
         - containerPort: 80
       imagePullSecrets:
