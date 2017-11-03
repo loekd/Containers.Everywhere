@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Web.Repositories;
@@ -81,6 +83,20 @@ namespace Web.Controllers
                 CreatedAt = existingState.CreatedAt,
                 Store = _storeType
             });
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> PingDb()
+        {
+            try
+            {
+                var addresses = await Dns.GetHostAddressesAsync("db").ConfigureAwait(false);
+                return Ok(addresses.Select(a => a.ToString()).ToList());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
