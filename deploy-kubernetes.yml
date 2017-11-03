@@ -54,11 +54,11 @@ spec:
       containers:
       - name: db
         image: microsoft/mssql-server-linux:latest
-		env:
+        env:
         - name: ACCEPT_EULA
           value: y
-		- name: SA_PASSWORD
-		  value: yourStrong(!)Password
+        - name: SA_PASSWORD
+          value: yourStrong(!)Password
         ports:
         - containerPort: 1433      
       nodeSelector:
