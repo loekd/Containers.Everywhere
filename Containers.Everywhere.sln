@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{062A430A-8581-4C5B-BCF8-D4821FF61F76}"
 EndProject
@@ -13,6 +13,8 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8632DDE-09BA-4A53-A287-B0332E7BDE7F}"
 	ProjectSection(SolutionItems) = preProject
+		deploy-aci-arm.json = deploy-aci-arm.json
+		deploy-empty-arm.json = deploy-empty-arm.json
 		deploy-kubernetes.yml = deploy-kubernetes.yml
 	EndProjectSection
 EndProject

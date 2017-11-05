@@ -5,17 +5,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Web.Repositories;
 using CounterState = Web.Models.CounterState;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Web.Controllers
 {
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
+        private readonly IHostingEnvironment _env;
         private readonly ICounterRepository _counterRepository;
         private readonly string _storeType;
 
-        public SampleDataController(ICounterRepository counterRepository)
+        public SampleDataController(ICounterRepository counterRepository, IHostingEnvironment env)
         {
+            _env = env ?? throw new ArgumentNullException(nameof(env));
             _counterRepository = counterRepository ?? throw new ArgumentNullException(nameof(counterRepository));
             _storeType = counterRepository.GetType().Name;
         }
@@ -23,66 +26,80 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            await _counterRepository.Initialize();
-
-            var state = await _counterRepository
-                .GetLast();
-
-            if (state == null)
-                return NotFound();
-
-            return Ok(new CounterState
+            try
             {
-                Count = state.Count,
-                CreatedAt = state.CreatedAt,
-                Store = _storeType
-            });
+                await _counterRepository.Initialize();
+
+                var state = await _counterRepository
+                    .GetLast();
+
+                if (state == null)
+                    return NotFound();
+
+                return Ok(new CounterState
+                {
+                    Count = state.Count,
+                    CreatedAt = state.CreatedAt,
+                    Store = _storeType
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CounterState state)
         {
-            await _counterRepository.Initialize();
+            try
+            {
+                await _counterRepository.Initialize();
 
-            bool exists = false;
-            var existingState = await _counterRepository
-                .GetLast();
+                bool exists = false;
+                var existingState = await _counterRepository
+                    .GetLast();
 
-            if (existingState == null)
-            {
-                existingState = new Repositories.CounterState();
-            }
-            else
-            {
-                exists = true;
-            }
+                if (existingState == null)
+                {
+                    existingState = new Repositories.CounterState();
+                }
+                else
+                {
+                    exists = true;
+                }
 
-            existingState.CreatedAt = DateTimeOffset.UtcNow;
-            
-            if (!state.Count.HasValue || Math.Abs(state.Count.Value - existingState.Count) > 10)
-            {
-                existingState.Count += 1;
-            }
-            else
-            {
-                existingState.Count = state.Count.Value;
-            }
+                existingState.CreatedAt = DateTimeOffset.UtcNow;
 
-            if (exists)
-            {
-                await _counterRepository.Update(existingState);
+                if (!state.Count.HasValue || Math.Abs(state.Count.Value - existingState.Count) > 10)
+                {
+                    existingState.Count += 1;
+                }
+                else
+                {
+                    existingState.Count = state.Count.Value;
+                }
+
+                if (exists)
+                {
+                    await _counterRepository.Update(existingState);
+                }
+                else
+                {
+                    await _counterRepository.Add(existingState);
+                }
+
+                return Ok(new CounterState
+                {
+                    Count = existingState.Count,
+                    CreatedAt = existingState.CreatedAt,
+                    Store = _storeType
+                });
             }
-            else
+            catch (Exception ex)
             {
-                await _counterRepository.Add(existingState);
+                return StatusCode(500, ex.Message);
             }
- 
-            return Ok(new CounterState
-            {
-                Count = existingState.Count,
-                CreatedAt = existingState.CreatedAt,
-                Store = _storeType
-            });
         }
 
         [HttpGet("[action]")]
@@ -99,6 +116,11 @@ namespace Web.Controllers
             }
         }
 
+        [HttpGet("[action]")]
+        public IActionResult Environment()
+        {
+            return Ok(_env.EnvironmentName);
+        }
 
         [HttpGet("[action]")]
         public async Task<IActionResult> QueryDb()
