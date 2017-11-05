@@ -75,7 +75,7 @@ spec:
         - name: ACCEPT_EULA
           value: "y"
         - name: SA_PASSWORD
-          value: yourStrong(!)Password
+          value: "__DbPassword__"
         ports:
         - containerPort: 1433
       nodeSelector:
