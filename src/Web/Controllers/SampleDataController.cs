@@ -103,11 +103,11 @@ namespace Web.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> PingDb()
+        public async Task<IActionResult> PingDb([FromQuery]string dbHostName = "db")
         {
             try
             {
-                var addresses = await Dns.GetHostAddressesAsync("db").ConfigureAwait(false);
+                var addresses = await Dns.GetHostAddressesAsync(dbHostName).ConfigureAwait(false);
                 return Ok(addresses.Select(a => a.ToString()).ToList());
             }
             catch (Exception ex)
@@ -120,32 +120,6 @@ namespace Web.Controllers
         public IActionResult Environment()
         {
             return Ok(_env.EnvironmentName);
-        }
-
-        [HttpGet("[action]")]
-        public async Task<IActionResult> QueryDb()
-        {
-            try
-            {
-                await _counterRepository.Initialize();
-
-                var state = await _counterRepository
-                    .GetLast();
-
-                if (state == null)
-                    return NotFound();
-
-                return Ok(new CounterState
-                {
-                    Count = state.Count,
-                    CreatedAt = state.CreatedAt,
-                    Store = _storeType
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        }       
     }
 }
