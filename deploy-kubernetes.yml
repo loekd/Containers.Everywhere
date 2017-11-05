@@ -47,6 +47,9 @@ spec:
       containers:
       - name: website
         image: containerseverywhere.azurecr.io/web:__Build.BuildId__
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "k8s"
         ports:
         - containerPort: 80
       imagePullSecrets:

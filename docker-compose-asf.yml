@@ -7,6 +7,8 @@ services:
     image: containerseverywhere.azurecr.io/web:__Build.BuildId__
     ports:
       - "80:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=asf
 
   db:
     ports:
