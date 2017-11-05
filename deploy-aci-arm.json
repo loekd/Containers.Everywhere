@@ -77,15 +77,15 @@
               "port": "80"
             }
           ]
-        }
-      },
-      "imageRegistryCredentials": [
-        {
-          "server": "containerseverywhere.azurecr.io",
-          "username": "containerseverywhere",
-          "password": "__ImageRegistryPassword__"
-        }
-      ]
+        },
+        "imageRegistryCredentials": [
+          {
+            "server": "containerseverywhere.azurecr.io",
+            "username": "containerseverywhere",
+            "password": "__ImageRegistryPassword__"
+          }
+        ]
+      }
     }
   ],
   "outputs": {
