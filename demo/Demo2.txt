@@ -1,0 +1,42 @@
+﻿dir c:\
+
+#run iis
+docker run --name iis -p 80 -d loekd/iis
+
+#attach console to container
+docker exec -ti iis cmd
+
+#set color
+color 0e
+
+#show files are internal
+dir
+mkdir c:\testfolder
+cd testfolder
+echo "this was stored inside the container" > "hello.txt"
+type hello.txt
+exit
+color 07
+
+#cleanup
+docker rm -f iis
+
+#restart
+docker run --name iis -p 80 -d loekd/iis
+#attach console to container
+docker exec -ti iis cmd
+#set color
+color 0e
+dir
+exit
+color 07
+
+
+#show it's not on host 
+dir c:\testfolder
+
+#cleanup
+docker rm -f iis
+
+#exit
+exit

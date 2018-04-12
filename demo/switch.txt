@@ -1,0 +1,2 @@
+﻿#toggle between container platforms
+"%ProgramFiles%\Docker\Docker\DockerCli.exe" -SwitchDaemon

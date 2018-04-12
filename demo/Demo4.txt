@@ -1,0 +1,41 @@
+﻿#switch to Linux
+"%ProgramFiles%\Docker\Docker\DockerCli.exe" -SwitchDaemon
+
+#show & create network
+docker network ls
+docker network create mynetwork
+docker network ls
+
+#show Linux images from microsoft
+docker images microsoft/*
+
+#run connected containers
+docker run --network mynetwork --name web -h web -d -p 80:80 web
+docker run --network mynetwork --name db -h db -d -e ACCEPT_EULA=y -e SA_PASSWORD=yourStrong(!)Password -p 1433 microsoft/mssql-server-linux
+
+#set color
+color 0e
+
+#attach to container
+docker exec -ti web bash
+ping db -c 1 db
+curl web
+exit
+
+#set color
+color 07
+
+#show this is working
+explorer "http://localhost"
+
+#clean up
+
+docker rm -f web
+docker rm -f db
+docker network rm mynetwork
+
+#switch back to Windows containers...
+"%ProgramFiles%\Docker\Docker\DockerCli.exe" -SwitchDaemon
+
+#exit
+exit

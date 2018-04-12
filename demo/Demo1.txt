@@ -1,0 +1,19 @@
+﻿#show images
+docker images
+
+#run iis
+docker run --name iis -p 80 -d loekd/iis
+
+#find container IP and run explorer
+docker inspect iis
+for /f %i in ('docker inspect -f "{{ .NetworkSettings.Networks.nat.IPAddress }}" iis') do set ip=%i
+
+#launch browser
+explorer "http://%ip%"
+
+exit
+#cleanup
+docker rm -f iis
+
+#exit
+exit

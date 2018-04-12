@@ -1,0 +1,39 @@
+﻿#run with volume
+docker volume create myvolume
+docker run --name iis -p 80 -d -v myvolume:c:\attached loekd/iis
+
+docker exec -ti iis cmd 
+#set color
+color 0e
+
+#write to volume
+dir c:\
+cd c:\attached
+echo "this was stored outside of the container" > "hello.txt"
+type hello.txt
+exit
+color 07
+
+docker rm -f iis
+
+#show volume data
+dir c:\ProgramData\Docker\volumes\myvolume\_data
+type c:\ProgramData\Docker\volumes\myvolume\_data\hello.txt
+
+#restart
+docker run --name iis -p 80 -d -v myvolume:c:\attached loekd/iis
+#attach console to container
+docker exec -ti iis cmd
+#set color
+color 0e
+dir
+type c:\attached\hello.txt
+exit
+color 07
+
+#cleanup
+docker rm -f iis
+docker volume rm -f myvolume
+
+#exit
+exit
