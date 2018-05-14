@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 
 services:
   web:
@@ -16,7 +16,7 @@ services:
     volumes:
       - mssql_server_data:/var/oconnectionpt/mssql/data
     environment:
-      - ACCEPT_EULA=y
-      - SA_PASSWORD=yourStrong(!)Password
+      "ACCEPT_EULA": "y"
+      "SA_PASSWORD": "yourStrong(!)Password"
 volumes:
   mssql_server_data:
