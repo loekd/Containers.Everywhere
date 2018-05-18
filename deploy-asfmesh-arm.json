@@ -1,0 +1,146 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Location of the resources."
+      }
+    },
+    "registry-server": {
+      "type": "string",
+      "defaultValue": "containerseverywhere.azurecr.io",
+      "metadata": {
+        "description": "Private image registry server."
+      }
+    },
+    "registry-username": {
+      "type": "string",
+      "defaultValue": "containerseverywhere",
+      "metadata": {
+        "description": "User name for the private image registry server."
+      }
+    },
+    "registry-password": {
+      "type": "string",
+      "defaultValue": "__ImageRegistryPassword__",
+      "metadata": {
+        "description": "Password for the private image registry server."
+      }
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2018-03-01-privatepreview",
+      "name": "WebsiteNetwork",
+      "type": "Microsoft.ServiceFabric/networks",
+      "location": "[parameters('location')]",
+      "dependsOn": [],
+      "properties": {
+        "description": "Private network for application",
+        "addressPrefix": "10.0.0.4/22",
+        "ingressConfig": {
+          "qosLevel": "bronze",
+          "layer4": [
+            {
+              "publicPort": "80",
+              "applicationName": "WebsiteApp",
+              "serviceName": "Website",
+              "endpointName": "Endpoint1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "apiVersion": "2018-03-01-privatepreview",
+      "name": "WebsiteApp",
+      "type": "Microsoft.ServiceFabric/applications",
+      "location": "[parameters('location')]",
+      "properties": {
+        "description": "Containers Everywhere",
+        "services": [
+          {
+            "name": "Website",
+            "properties": {
+              "description": "Web frontend.",
+              "osType": "linux",
+              "codePackages": [
+                {
+                  "name": "Website.Code",
+                  "image": "containerseverywhere.azurecr.io/web:__Build.BuildId__",
+                  "imageRegistryCredential": {
+                    "server": "[parameters('registry-server')]",
+                    "username": "[parameters('registry-username')]",
+                    "password": "[parameters('registry-password')]"
+                  },
+                  "endpoints": [
+                    {
+                      "name": "Endpoint1",
+                      "port": 80
+                    }
+                  ],
+                  "resources": {
+                    "requests": {
+                      "cpu": 1,
+                      "memoryInGB": 1
+                    }
+                  }
+                }
+              ],
+              "replicaCount": 1,
+              "networkRefs": [
+                {
+                  "name": "[resourceId('Microsoft.ServiceFabric/networks', 'WebsiteNetwork')]"
+                }
+              ]
+            }
+          },
+          {
+            "name": "db",
+            "properties": {
+              "description": "Database.",
+              "osType": "linux",
+              "codePackages": [
+                {
+                  "name": "VotingData.Code",
+                  "image": "microsoft/mssql-server-linux:2017-latest",
+                  "endpoints": [
+                    {
+                      "name": "Endpoint1",
+                      "port": 1433
+                    }
+                  ],
+                  "environmentVariables": [
+                    {
+                      "name": "ACCEPT_EULA",
+                      "value": "y"
+                    },
+                    {
+                      "name": "SA_PASSWORD",
+                      "value": "__DbPassword__"
+                    }
+                  ],
+                  "resources": {
+                    "requests": {
+                      "cpu": 1,
+                      "memoryInGB": 2
+                    }
+                  }
+                }
+              ],
+              "replicaCount": 1,
+              "networkRefs": [
+                {
+                  "name": "[resourceId('Microsoft.ServiceFabric/networks', 'WebsiteNetwork')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
